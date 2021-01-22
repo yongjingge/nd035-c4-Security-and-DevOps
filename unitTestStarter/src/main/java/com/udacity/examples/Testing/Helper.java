@@ -53,7 +53,7 @@ public class Helper {
 	   }
 
 		/**
-		 * 
+		 * will remove all of the empty strings from the List parameter
 		 * @param empName
 		 * @return
 		 */
