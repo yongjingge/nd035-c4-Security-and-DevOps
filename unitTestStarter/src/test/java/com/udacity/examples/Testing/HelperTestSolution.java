@@ -13,11 +13,13 @@ import static org.junit.Assert.*;
 public class HelperTestSolution {
     @Before
     public void init() {
-        System.out.println("init executed"); }
+        System.out.println("init executed, runs before each test"); }
     @After
     public void teardown() {
-        System.out.println("teardown executed"); }
-    @Test
+        System.out.println("teardown executed, runs after each test"); }
+
+        @Ignore
+        @Test
     public void test() {
         assertNotEquals("test", "test1");    }
     @Test
@@ -49,11 +51,11 @@ public class HelperTestSolution {
     // This method must be public and static
     @BeforeClass
     public static void initClass() {
-        System.out.println("init Class executed");
+        System.out.println("init Class executed, runs before class");
     }
     @AfterClass
     public static void teardownclass() {
-        System.out.println("teardown Class executed");
+        System.out.println("teardown Class executed, runs after class");
     }
     @Test
     public void verify_ArrayListTest(){
