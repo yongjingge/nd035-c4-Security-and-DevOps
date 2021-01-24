@@ -36,13 +36,23 @@ public class UserController {
 
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
+		if (! userRepository.findById(id).isPresent()) {
+			log.error("Can not find user by this id: " + id);
+			return ResponseEntity.badRequest().build();
+		}
+		log.info("User found by this id: " + id);
 		return ResponseEntity.of(userRepository.findById(id));
 	}
 	
 	@GetMapping("/{username}")
 	public ResponseEntity<User> findByUserName(@PathVariable String username) {
 		User user = userRepository.findByUsername(username);
-		return user == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
+		if (user == null) {
+			log.error("Can not find user by this username: " + username);
+			return ResponseEntity.notFound().build();
+		}
+		log.info("User found by this username: " + username);
+		return ResponseEntity.ok(user);
 	}
 	
 	@PostMapping("/create")
@@ -57,12 +67,18 @@ public class UserController {
 
 		if (createUserRequest.getPassword().length() < 7 ||
 				! createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
+			log.error("Password: " + createUserRequest.getPassword() + " was not set correctly, please follow the rules.");
 			return ResponseEntity.badRequest().build();
 		}
 		user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
 
-		userRepository.save(user);
-		return ResponseEntity.ok(user);
+		try {
+			userRepository.save(user);
+			log.info("User " + user.getUsername() + "created successfully!");
+			return ResponseEntity.ok(user);
+		} catch (Exception e) {
+			log.error(e.getLocalizedMessage());
+			return ResponseEntity.badRequest().build();
+		}
 	}
-	
 }
