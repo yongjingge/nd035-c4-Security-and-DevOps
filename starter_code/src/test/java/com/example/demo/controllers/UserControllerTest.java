@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -41,18 +43,74 @@ public class UserControllerTest {
     public void create_user_happy_path () {
         when(bCryptPasswordEncoder.encode("password1")).thenReturn("thisishashed");
 
-        CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setUsername("testuser");
-        createUserRequest.setPassword("password1");
-        createUserRequest.setConfirmPassword("password1");
+        CreateUserRequest userRequest = getSampleUserRequest();
+        ResponseEntity<User> res = userController.createUser(userRequest);
+        assertNotNull(res);
+        assertEquals(200, res.getStatusCodeValue());
 
-        ResponseEntity<User> response = userController.createUser(createUserRequest);
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-
-        User user = response.getBody();
+        User user = res.getBody();
         assertEquals(0, user.getId());
         assertEquals("testuser", user.getUsername());
         assertEquals("thisishashed", user.getPassword());
+    }
+
+    @Test
+    public void testFindById () {
+        when(bCryptPasswordEncoder.encode("password1")).thenReturn("thisishashed");
+
+        CreateUserRequest userRequest = getSampleUserRequest();
+        ResponseEntity<User> res = userController.createUser(userRequest);
+        User user = res.getBody();
+        assertNotNull(user);
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        ResponseEntity<User> findByIdRes = userController.findById(user.getId());
+        assertNotNull(findByIdRes);
+        assertEquals(200, findByIdRes.getStatusCodeValue());
+        User findByIdUserRes = findByIdRes.getBody();
+        assertEquals(user.getUsername(), findByIdUserRes.getUsername());
+    }
+
+    @Test
+    public void testFindByIdAndNotFound () {
+        ResponseEntity<User> userNotFound = userController.findById(2L);
+        assertEquals(404, userNotFound.getStatusCodeValue());
+    }
+
+    @Test
+    public void testFindByUserName () {
+        when(bCryptPasswordEncoder.encode("password1")).thenReturn("thisishashed");
+
+        CreateUserRequest userRequest = getSampleUserRequest();
+        ResponseEntity<User> res = userController.createUser(userRequest);
+        User user = res.getBody();
+        assertNotNull(user);
+
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+
+        ResponseEntity<User> findByUsernameRes = userController.findByUserName(user.getUsername());
+        assertNotNull(findByUsernameRes);
+        assertEquals(200, findByUsernameRes.getStatusCodeValue());
+        User findByUsernameUserRes = findByUsernameRes.getBody();
+        assertEquals(user.getUsername(), findByUsernameUserRes.getUsername());
+    }
+
+    @Test
+    public void testFindByUserNameAndNotFound () {
+        ResponseEntity<User> userNotFound = userController.findByUserName("Tom");
+        assertEquals(404, userNotFound.getStatusCodeValue());
+    }
+
+    /**
+     * Helper Method to get a CreateUserRequest object
+     * @return
+     */
+    private static CreateUserRequest getSampleUserRequest () {
+        CreateUserRequest userRequest = new CreateUserRequest();
+        userRequest.setUsername("testuser");
+        userRequest.setPassword("password1");
+        userRequest.setConfirmPassword("password1");
+        return userRequest;
     }
 }

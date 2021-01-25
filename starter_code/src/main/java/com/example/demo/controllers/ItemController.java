@@ -26,6 +26,11 @@ public class ItemController {
 	
 	@GetMapping
 	public ResponseEntity<List<Item>> getItems() {
+		if (itemRepository.findAll().isEmpty()) {
+			log.error("No item found");
+			return ResponseEntity.notFound().build();
+		}
+		log.info("Items found");
 		return ResponseEntity.ok(itemRepository.findAll());
 	}
 	
@@ -33,7 +38,7 @@ public class ItemController {
 	public ResponseEntity<Item> getItemById(@PathVariable Long id) {
 		if (! itemRepository.findById(id).isPresent()) {
 			log.error("Can not find item by this id: " + id);
-			return ResponseEntity.badRequest().build();
+			return ResponseEntity.notFound().build();
 		}
 		log.info("Item found by this id: " + id);
 		return ResponseEntity.of(itemRepository.findById(id));

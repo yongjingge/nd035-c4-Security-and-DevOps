@@ -38,7 +38,7 @@ public class UserController {
 	public ResponseEntity<User> findById(@PathVariable Long id) {
 		if (! userRepository.findById(id).isPresent()) {
 			log.error("Can not find user by this id: " + id);
-			return ResponseEntity.badRequest().build();
+			return ResponseEntity.notFound().build();
 		}
 		log.info("User found by this id: " + id);
 		return ResponseEntity.of(userRepository.findById(id));
