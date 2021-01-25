@@ -58,8 +58,13 @@ public class UserController {
 	@PostMapping("/create")
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
 		User user = new User();
-		user.setUsername(createUserRequest.getUsername());
+
+		if (createUserRequest.getUsername() == null || createUserRequest.getUsername() == "") {
+			log.error("Username can not be null or empty");
+			return ResponseEntity.badRequest().build();
+		}
 		log.info("Username set successfully: " + createUserRequest.getUsername());
+		user.setUsername(createUserRequest.getUsername());
 
 		Cart cart = new Cart();
 		cartRepository.save(cart);
@@ -74,10 +79,10 @@ public class UserController {
 
 		try {
 			userRepository.save(user);
-			log.info("User " + user.getUsername() + "created successfully!");
+			log.info("User " + user.getUsername() + " created successfully!");
 			return ResponseEntity.ok(user);
 		} catch (Exception e) {
-			log.error(e.getLocalizedMessage());
+			log.error("Exception throws: " + e.toString());
 			return ResponseEntity.badRequest().build();
 		}
 	}

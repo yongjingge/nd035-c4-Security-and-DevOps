@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -80,6 +81,21 @@ public class OrderControllerTest {
     public void testGetOrdersForUserNotFound () {
         ResponseEntity<List<UserOrder>> res = orderController.getOrdersForUser("namenotexist");
         assertEquals(404, res.getStatusCodeValue());
+    }
+
+    @Test
+    public void testGetOrdersForOrderNotFound () {
+        User user = getUserForTest();
+        Item item = getItemForTest();
+        Cart cart = getCartForTest();
+        user.setCart(cart);
+        cart.setUser(user);
+
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+        when(orderRepository.findByUser(user)).thenReturn(new ArrayList<>());
+
+        ResponseEntity<List<UserOrder>> orderListNotFoundRes = orderController.getOrdersForUser(user.getUsername());
+        assertEquals(404, orderListNotFoundRes.getStatusCodeValue());
     }
 
     private static User getUserForTest () {

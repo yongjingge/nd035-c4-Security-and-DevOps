@@ -42,6 +42,10 @@ public class OrderController {
 			return ResponseEntity.notFound().build();
 		}
 		UserOrder order = UserOrder.createFromCart(user.getCart());
+		if (order.getItems().isEmpty() || order.getItems() == null) {
+			log.error("Cart is empty, can not submit this order");
+			return ResponseEntity.badRequest().build();
+		}
 		orderRepository.save(order);
 		log.info("Order of " + username + " is created successfully");
 		return ResponseEntity.ok(order);
@@ -54,7 +58,12 @@ public class OrderController {
 			log.error("Can not find user by this username: " + username);
 			return ResponseEntity.notFound().build();
 		}
-		log.info("Orders found by this username: " + username);
-		return ResponseEntity.ok(orderRepository.findByUser(user));
+
+		if (orderRepository.findByUser(user) == null || ! orderRepository.findByUser(user).isEmpty()) {
+			log.info("Orders found by this username: " + username);
+			return ResponseEntity.ok(orderRepository.findByUser(user));
+		}
+		log.error("This user has no history order");
+		return ResponseEntity.notFound().build();
 	}
 }
