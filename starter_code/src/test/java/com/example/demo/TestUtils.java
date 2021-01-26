@@ -9,7 +9,8 @@ public class TestUtils {
         boolean wasPrivate = false;
         try {
             Field field = target.getClass().getDeclaredField(fieldName);
-            boolean accessibility = field.canAccess(target);
+            // boolean accessibility = field.canAccess(target);
+            boolean accessibility = field.isAccessible();
             // check whether the field is private or not
             if (! accessibility) {
                 field.setAccessible(true);
