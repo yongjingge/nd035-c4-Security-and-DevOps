@@ -10,12 +10,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -41,7 +41,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             new ArrayList<>()
                     )
             );
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +51,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                              HttpServletResponse res,
                                              FilterChain chain,
                                              Authentication auth)
-        throws IOException, ServletException {
+    {
         String token = JWT.create()
                 .withSubject(((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
@@ -60,4 +59,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
     }
 
+    @Override
+    protected void unsuccessfulAuthentication (HttpServletRequest req,
+                                               HttpServletResponse res,
+                                               AuthenticationException e) throws IOException, ServletException {
+        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+    }
 }

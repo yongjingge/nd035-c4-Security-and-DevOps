@@ -1,3 +1,48 @@
-.idea/
+HELP.md
+
+## MacOs ##
+
 .DS_Store
+
 .DS_Store?
+
+## removed target/ in order to deploy from docker image
+
+### STS ###
+
+.apt_generated
+
+.classpath
+
+.factorypath
+
+.project
+
+.settings
+
+.springBeans
+
+.sts4-cache
+
+### IntelliJ IDEA ###
+
+.idea
+
+.idea/
+
+*.iws
+
+*.iml
+
+*.ipr
+
+## Project exclude paths ##
+
+/auth-course.iml
+
+/target/
+
+app.log.2021-01-25.0.gz
+
+app.log.2021-01-26.0.gz
+
